@@ -1,7 +1,6 @@
 package com.example.demo;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import com.example.demo.domain.Member;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
