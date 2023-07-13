@@ -8,11 +8,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
 
   @Id @GeneratedValue
@@ -28,6 +31,10 @@ public class OrderItem {
 
   private int orderPrice; //주문 가격
   private int count; //주문 수량
+
+  //@NoArgsConstructor(access = AccessLevel.PROTECTED) 로 대체
+//  protected OrderItem() {
+//  }
 
   /**
    * 주문 상품 생성
