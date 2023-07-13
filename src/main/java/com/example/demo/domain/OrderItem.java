@@ -28,4 +28,31 @@ public class OrderItem {
 
   private int orderPrice; //주문 가격
   private int count; //주문 수량
+
+  /**
+   * 주문 상품 생성
+   * */
+  public static OrderItem createOrderItem(Item item, int orderPrice, int count) {
+    OrderItem orderItem = new OrderItem();
+    orderItem.setItem(item);
+    orderItem.setOrderPrice(orderPrice);
+    orderItem.setCount(count);
+
+    item.removeStock(count);
+    return orderItem;
+  }
+
+  /**
+   * 주문 취소 시, 상품 취소
+   * */
+  public void cancel() {
+    getItem().addStock(count);
+  }
+
+  /**
+   * 주문 총 가격 조회 시, 가격조회
+   * */
+  public int getTotalPrice() {
+    return getOrderPrice() * getCount();
+  }
 }
