@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.fail;
 
 import com.example.demo.domain.Address;
@@ -48,8 +49,18 @@ public class OrderServiceTest {
   @Test
   public void order_cancel() throws Exception {
     //given
+    Member member = createMember();
+    Book item = createBook(10000, 10);
+    int orderCount = 2;
+    Long orderId = orderService.order(member.getId(), item.getId(), orderCount);
+
     //when
+    orderService.cancelOrder(orderId);
+
     //then
+    Order getOrder = orderRepository.findOne(orderId);
+    assertEquals("주문 취소 시 상태는 CALCEL이다.", OrderStatus.CANCEL, getOrder.getStatus());
+    assertEquals("주문이 취소된 상품은 그만큼 재고가 증가해야 한다.", 10, item.getStockQuantity());
   }
 
   @Test(expected = NotEnoughStockException.class)
