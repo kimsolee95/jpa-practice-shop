@@ -29,6 +29,15 @@ public class ItemService {
     return findItem;
   }
 
+  @Transactional
+  public Item updateItemRefactoring(Long itemId, String name, int price, int stockQuantity) {
+    Item findItem = itemRepository.findOne(itemId);
+    findItem.setPrice(price);
+    findItem.setName(name);
+    findItem.setStockQuantity(stockQuantity);
+    return findItem;
+  }
+
   public List<Item> findItems() {
     return itemRepository.findAll();
   }

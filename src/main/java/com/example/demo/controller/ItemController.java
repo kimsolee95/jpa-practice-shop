@@ -33,10 +33,13 @@ public class ItemController {
 
     @PostMapping("/items/{itemId}/edit")
     public ResponseEntity<?> updateItem(
-            @PathVariable("itemId") String itemId, @RequestBody BookForm form) {
+            @PathVariable("itemId") Long itemId, @RequestBody BookForm form) {
         //todo: 해당 user가 item에 대한 권한이 있는지 check 하는 logic
-        Book book = Book.from(form); //준영속 상태의 data
-        itemService.saveItem(book);
+        //case 1
+//        Book book = Book.from(form); //준영속 상태의 data
+//        itemService.saveItem(book);
+        //권장 case
+        itemService.updateItemRefactoring(itemId, form.getName(), form.getPrice(), form.getStockQuantity());
         return new ResponseEntity<>("book create success", HttpStatus.OK);
     }
 
