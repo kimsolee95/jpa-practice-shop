@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.domain.item.Book;
 import com.example.demo.domain.item.Item;
 import com.example.demo.repository.ItemRepository;
 import java.util.List;
@@ -17,6 +18,14 @@ public class ItemService {
   @Transactional
   public void saveItem(Item item) {
     itemRepository.save(item);
+  }
+
+  @Transactional
+  public void updateItem(Long itemId, Book param) {
+    Item findItem = itemRepository.findOne(itemId); //영속상태의 객체 -> 더티체킹 (변경감지)
+    findItem.setPrice(param.getPrice());
+    findItem.setName(param.getName());
+    findItem.setStockQuantity(param.getStockQuantity());
   }
 
   public List<Item> findItems() {
