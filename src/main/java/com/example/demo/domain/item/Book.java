@@ -28,4 +28,15 @@ public class Book extends Item {
             .build();
   }
 
+  public static Book from(BookForm form) {
+    return Book.builder()
+        .id(form.getId())
+        .name(form.getName())
+        .price(form.getPrice())
+        .stockQuantity(form.getStockQuantity())
+        .author(form.getAuthor())
+        .isbn(form.getIsbn())
+        .build();
+  }
+
 }

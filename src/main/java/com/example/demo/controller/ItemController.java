@@ -35,7 +35,7 @@ public class ItemController {
     public ResponseEntity<?> updateItem(
             @PathVariable("itemId") String itemId, @RequestBody BookForm form) {
         //todo: 해당 user가 item에 대한 권한이 있는지 check 하는 logic
-        Book book = Book.createBook(form);
+        Book book = Book.from(form);
         itemService.saveItem(book);
         return new ResponseEntity<>("book create success", HttpStatus.OK);
     }
