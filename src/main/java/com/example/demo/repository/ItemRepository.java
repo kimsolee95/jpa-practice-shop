@@ -17,7 +17,8 @@ public class ItemRepository {
       em.persist(item);
     } else {
       //준영속상태의 엔티티에 대해서 넘어온 엔티티를 영속상태로 바꾸는 것임
-      em.merge(item);
+      //parameter가 변하는 것이 아니라 반환값이 변하는 것!
+      Item mergeItem = em.merge(item);
     }
   }
 

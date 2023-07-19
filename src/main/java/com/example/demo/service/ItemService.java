@@ -21,11 +21,12 @@ public class ItemService {
   }
 
   @Transactional
-  public void updateItem(Long itemId, Book param) {
+  public Item updateItem(Long itemId, Book param) {
     Item findItem = itemRepository.findOne(itemId); //영속상태의 객체 -> 더티체킹 (변경감지)
     findItem.setPrice(param.getPrice());
     findItem.setName(param.getName());
     findItem.setStockQuantity(param.getStockQuantity());
+    return findItem;
   }
 
   public List<Item> findItems() {
