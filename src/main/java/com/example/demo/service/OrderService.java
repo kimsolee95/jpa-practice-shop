@@ -8,6 +8,8 @@ import com.example.demo.domain.item.Item;
 import com.example.demo.repository.ItemRepository;
 import com.example.demo.repository.MemberRepository;
 import com.example.demo.repository.OrderRepository;
+import com.example.demo.repository.OrderSearch;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,5 +51,10 @@ public class OrderService {
     order.cancel(); //더티체킹을 통한 data 변경
   }
 
-  //검색
+  /**
+   * 주문 검색
+   * */
+  public List<Order> findOrders(OrderSearch orderSearch) {
+    return orderRepository.findAll(orderSearch);
+  }
 }
