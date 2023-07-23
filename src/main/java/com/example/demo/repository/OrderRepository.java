@@ -30,4 +30,24 @@ public class OrderRepository {
         .getResultList();
   }
 
+  /**
+   * Lazy 를 무시하고 객체에 값을 다 채우는 select
+   * fetch join
+   * */
+  public List<Order> findAllWithMemberDelivery() {
+    return em.createQuery(
+        "select o from Order o" +
+            " join fetch o.member" +
+            " join fetch o.delivery d", Order.class
+    ).getResultList();
+  }
+
+  public List<OrderSimpleQueryDto> findOrderDtos() {
+    return em.createQuery(
+        "select new com.example.demo.repository.OrderSimpleQueryDto(o.id, m.name, o.orderData, o.status, d.address) " +
+            " from Order o" +
+        " join o.member m" +
+        " join o.delivery d", OrderSimpleQueryDto.class)
+        .getResultList();
+  }
 }

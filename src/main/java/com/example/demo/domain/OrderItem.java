@@ -1,6 +1,7 @@
 package com.example.demo.domain;
 
 import com.example.demo.domain.item.Item;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -25,6 +26,7 @@ public class OrderItem {
   @ManyToOne(fetch = FetchType.LAZY)
   private Item item;
 
+  @JsonIgnore
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id")
   private Order order;
