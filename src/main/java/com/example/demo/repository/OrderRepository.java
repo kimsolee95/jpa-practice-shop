@@ -1,6 +1,7 @@
 package com.example.demo.repository;
 
 import com.example.demo.domain.Order;
+import com.example.demo.repository.order.simplequery.OrderSimpleQueryDto;
 import java.util.List;
 import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,7 @@ public class OrderRepository {
 
   public List<OrderSimpleQueryDto> findOrderDtos() {
     return em.createQuery(
-        "select new com.example.demo.repository.OrderSimpleQueryDto(o.id, m.name, o.orderData, o.status, d.address) " +
+        "select new com.example.demo.repository.order.simplequery.OrderSimpleQueryDto(o.id, m.name, o.orderData, o.status, d.address) " +
             " from Order o" +
         " join o.member m" +
         " join o.delivery d", OrderSimpleQueryDto.class)

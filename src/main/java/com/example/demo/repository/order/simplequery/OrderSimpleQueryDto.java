@@ -1,4 +1,4 @@
-package com.example.demo.repository;
+package com.example.demo.repository.order.simplequery;
 
 import com.example.demo.domain.Address;
 import com.example.demo.domain.Order;

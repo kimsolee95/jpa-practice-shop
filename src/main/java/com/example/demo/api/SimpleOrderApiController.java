@@ -5,7 +5,8 @@ import com.example.demo.domain.Order;
 import com.example.demo.domain.OrderStatus;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.OrderSearch;
-import com.example.demo.repository.OrderSimpleQueryDto;
+import com.example.demo.repository.order.simplequery.OrderSimpleQueryDto;
+import com.example.demo.repository.order.simplequery.OrderSimpleQueryRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SimpleOrderApiController {
 
   private final OrderRepository orderRepository;
+  private final OrderSimpleQueryRepository orderSimpleQueryRepository;
 
   /**
    * anti pattern
@@ -64,7 +66,7 @@ public class SimpleOrderApiController {
 
   @GetMapping("/api/v4/simple-orders")
   public List<OrderSimpleQueryDto> orderV4() {
-    return orderRepository.findOrderDtos();
+    return orderSimpleQueryRepository.findORderDtos();
   }
 
 
