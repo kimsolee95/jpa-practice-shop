@@ -13,10 +13,10 @@ public class DemoApplication {
 		SpringApplication.run(DemoApplication.class, args);
 	}
 
-//	@Bean
-//	Hibernate5Module hibernate5Module() {
-//		Hibernate5Module hibernate5Module = new Hibernate5Module();
-//		hibernate5Module.configure(Feature.FORCE_LAZY_LOADING, true);
-//		return new Hibernate5Module();
-//	}
+	@Bean
+	Hibernate5Module hibernate5Module() {
+		Hibernate5Module hibernate5Module = new Hibernate5Module();
+		hibernate5Module.configure(Feature.FORCE_LAZY_LOADING, true);
+		return new Hibernate5Module();
+	}
 }
