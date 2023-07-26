@@ -9,6 +9,7 @@ import com.example.demo.repository.OrderSearch;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,12 +41,13 @@ public class OrderApiController {
   @GetMapping("/api/v2/orders")
   public List<OrderDto> ordersV2() {
     List<Order> orders = orderRepository.findAll(new OrderSearch());
-    List<OrderDto> collect = orders.stream()
+    List<OrderDto> result = orders.stream()
         .map(o -> new OrderDto(o))
         .collect(Collectors.toList());
-    return collect;
+    return result;
   }
 
+  @Getter
   static class OrderDto {
 
     private Long orderId;
@@ -53,11 +55,31 @@ public class OrderApiController {
     private LocalDateTime orderDate;
     private OrderStatus orderStatus;
     private Address address;
-    private List<OrderItem> orderItems;
+    private List<OrderItemDto> orderItems; // 완전히 엔티티와 dto 간 의존을 끊는 것.
 
-
-    public OrderDto(Order o) {
+    public OrderDto(Order order) {
+      orderId = order.getId();
+      name = order.getMember().getName();
+      orderDate = order.getOrderDate();
+      orderStatus = order.getStatus();
+      address = order.getDelivery().getAddress();
+      orderItems = order.getOrderItems().stream()
+          .map(orderItem -> new OrderItemDto(orderItem))
+          .collect(Collectors.toList());
     }
   }
 
+  @Getter
+  static class OrderItemDto {
+
+    private String itemName; //상품명
+    private int orderPrice; //주문 가격
+    private int count; //주문 수량
+
+    public OrderItemDto (OrderItem orderItem) {
+      itemName = orderItem.getItem().getName();
+      orderPrice = orderItem.getOrderPrice();
+      count = orderItem.getCount();
+    }
+  }
 }
