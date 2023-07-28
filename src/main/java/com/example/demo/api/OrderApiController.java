@@ -6,6 +6,8 @@ import com.example.demo.domain.OrderItem;
 import com.example.demo.domain.OrderStatus;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.OrderSearch;
+import com.example.demo.repository.order.query.OrderQueryDto;
+import com.example.demo.repository.order.query.OrderQueryRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderApiController {
 
   private final OrderRepository orderRepository;
+  private final OrderQueryRepository orderQueryRepository;
 
   /**
    * anti pattern
@@ -70,6 +73,11 @@ public class OrderApiController {
         .map(o -> new OrderDto(o))
         .collect(Collectors.toList());
     return result;
+  }
+
+  @GetMapping("/api/v4/orders")
+  public List<OrderQueryDto> ordersV4() {
+    return orderQueryRepository.findOrderQueryDtos();
   }
 
   @Getter

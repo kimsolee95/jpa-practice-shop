@@ -15,6 +15,7 @@ import javax.persistence.ManyToMany;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
