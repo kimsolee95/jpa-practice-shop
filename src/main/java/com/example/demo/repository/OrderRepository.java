@@ -1,7 +1,12 @@
 package com.example.demo.repository;
 
 import com.example.demo.domain.Order;
+import com.example.demo.domain.OrderStatus;
+import com.example.demo.domain.QMember;
+import com.example.demo.domain.QOrder;
 import com.example.demo.repository.order.simplequery.OrderSimpleQueryDto;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -70,6 +75,30 @@ public class OrderRepository {
     }
 
     return query.getResultList();
+  }
+
+  /**
+   * findAll refactoring
+   * */
+  public List<Order> findAllByQueryDsl(OrderSearch orderSearch) {
+    QOrder order = QOrder.order;
+    QMember member = QMember.member;
+
+    JPAQueryFactory query = new JPAQueryFactory(em);
+    return query
+        .select(order)
+        .from(order)
+        .join(order.member, member)
+        .where(statusEq(orderSearch.getOrderStatus()))
+        .limit(1000)
+        .fetch();
+  }
+
+  private BooleanExpression statusEq(OrderStatus statusCond) {
+    if (statusCond == null) {
+      return null;
+    }
+    return QOrder.order.status.eq(statusCond);
   }
 
   /**
