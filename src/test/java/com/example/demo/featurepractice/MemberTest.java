@@ -1,12 +1,11 @@
 package com.example.demo.featurepractice;
 
-import com.example.demo.featurepractice.entity.Member;
 import com.example.demo.featurepractice.entity.Team;
+import com.example.demo.featurepractice.entity.TeamMember;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +25,10 @@ public class MemberTest {
     em.persist(teamA);
     em.persist(teamB);
 
-    Member member1 = new Member("member1", 10, teamA);
-    Member member2 = new Member("member2", 20, teamB);
-    Member member3 = new Member("member3", 10, teamA);
-    Member member4 = new Member("member4", 20, teamB);
+    TeamMember member1 = new TeamMember("member1", 10, teamA);
+    TeamMember member2 = new TeamMember("member2", 20, teamB);
+    TeamMember member3 = new TeamMember("member3", 10, teamA);
+    TeamMember member4 = new TeamMember("member4", 20, teamB);
     em.persist(member1);
     em.persist(member2);
     em.persist(member3);
@@ -39,7 +38,7 @@ public class MemberTest {
     em.flush();
     em.clear();
     //확인
-    List<Member> members = em.createQuery("select m from Member m", Member.class)
+    List<TeamMember> members = em.createQuery("select m from Member m", TeamMember.class)
         .getResultList();
   }
 

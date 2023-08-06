@@ -16,11 +16,11 @@ import lombok.ToString;
 @Entity
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(of = { "id", "username", "age"})
-public class Member {
+//@ToString(of = { "id", "username", "age"})
+public class TeamMember {
 
   @Id @GeneratedValue
-  @Column(name = "member_id")
+  @Column(name = "team_member_id")
   private Long id;
   private String username;
   private int age;
@@ -29,15 +29,15 @@ public class Member {
   @JoinColumn(name = "team_id")
   private Team team;
 
-  public Member(String username) {
+  public TeamMember(String username) {
     this(username, 0);
   }
 
-  public Member(String username, int age) {
+  public TeamMember(String username, int age) {
     this(username, age, null);
   }
 
-  public Member(String username, int age, Team team) {
+  public TeamMember(String username, int age, Team team) {
     this.username = username;
     this.age = age;
     if (team!= null) {
