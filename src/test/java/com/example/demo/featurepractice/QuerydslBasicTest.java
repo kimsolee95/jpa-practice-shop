@@ -3,6 +3,7 @@ package com.example.demo.featurepractice;
 import static com.example.demo.featurepractice.entity.QTeam.team;
 import static com.example.demo.featurepractice.entity.QTeamMember.teamMember;
 
+import com.example.demo.domain.Member;
 import com.example.demo.featurepractice.entity.QTeam;
 import com.example.demo.featurepractice.entity.QTeamMember;
 import com.example.demo.featurepractice.entity.Team;
@@ -211,6 +212,40 @@ public class QuerydslBasicTest {
 
     Assertions.assertThat(teamB.get(team.name)).isEqualTo("teamB");
     Assertions.assertThat(teamB.get(teamMember.age.avg())).isEqualTo(35);
+  }
+
+  /**
+   * 팀 A 소속 모든 회원
+   * */
+  @Test
+  public void join() {
+    List<TeamMember> result = queryFactory
+        .selectFrom(teamMember)
+        .join(teamMember.team, team)
+        .where(team.name.eq("teamA"))
+        .fetch();
+    Assertions.assertThat(result)
+        .extracting("username")
+        .containsExactly("member1", "member3");
+  }
+
+  /**
+   * 연관관계가 없어도 join 하는 예시
+   * */
+  @Test
+  public void theta_join() {
+    em.persist(new TeamMember("teamA"));
+    em.persist(new TeamMember("teamB"));
+
+    List<TeamMember> result = queryFactory
+        .select(teamMember)
+        .from(teamMember, team)
+        .where(teamMember.username.eq(team.name))
+        .fetch();
+
+    Assertions.assertThat(result)
+        .extracting("username")
+        .containsExactly("teamA", "teamB");
   }
 
 }
