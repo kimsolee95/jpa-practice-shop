@@ -1,10 +1,14 @@
 package com.example.demo.featurepractice;
 
+import static com.example.demo.featurepractice.entity.QTeam.team;
+import static com.example.demo.featurepractice.entity.QTeamMember.teamMember;
+
 import com.example.demo.featurepractice.entity.QTeam;
 import com.example.demo.featurepractice.entity.QTeamMember;
 import com.example.demo.featurepractice.entity.Team;
 import com.example.demo.featurepractice.entity.TeamMember;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -69,9 +73,9 @@ public class QuerydslBasicTest {
   @Test
   public void search() {
     TeamMember findTeamMember = queryFactory
-        .selectFrom(QTeamMember.teamMember)
-        .where(QTeamMember.teamMember.username.eq("member1")
-            .and(QTeamMember.teamMember.age.eq(10)))
+        .selectFrom(teamMember)
+        .where(teamMember.username.eq("member1")
+            .and(teamMember.age.eq(10)))
         .fetchOne();
     Assertions.assertThat(findTeamMember.getUsername()).isEqualTo("member1");
   }
@@ -79,12 +83,12 @@ public class QuerydslBasicTest {
   @Test
   public void searchAndParam() {
     TeamMember findTeamMember = queryFactory
-        .selectFrom(QTeamMember.teamMember)
+        .selectFrom(teamMember)
         .where(
 //            QTeamMember.teamMember.username.eq("member1")
 //            .and(QTeamMember.teamMember.age.between(10, 30))
-            QTeamMember.teamMember.username.eq("member1"),
-            QTeamMember.teamMember.age.eq(10)
+            teamMember.username.eq("member1"),
+            teamMember.age.eq(10)
         )
         .fetchOne();
     Assertions.assertThat(findTeamMember.getUsername()).isEqualTo("member1");
@@ -102,13 +106,13 @@ public class QuerydslBasicTest {
 //        .selectFrom(QTeamMember.teamMember)
 //        .fetchFirst();
     QueryResults<TeamMember> results = queryFactory
-        .selectFrom(QTeamMember.teamMember)
+        .selectFrom(teamMember)
         .fetchResults();
     results.getTotal();
     List<TeamMember> content = results.getResults();
 
     long total = queryFactory
-        .selectFrom(QTeamMember.teamMember)
+        .selectFrom(teamMember)
         .fetchCount();
   }
 
@@ -125,11 +129,11 @@ public class QuerydslBasicTest {
     em.persist(new TeamMember("member6", 100));
 
     List<TeamMember> result = queryFactory
-        .selectFrom(QTeamMember.teamMember)
-        .where(QTeamMember.teamMember.age.eq(100))
+        .selectFrom(teamMember)
+        .where(teamMember.age.eq(100))
         .orderBy(
-            QTeamMember.teamMember.age.desc(),
-            QTeamMember.teamMember.username.asc().nullsLast()
+            teamMember.age.desc(),
+            teamMember.username.asc().nullsLast()
             )
         .fetch();
 
@@ -144,8 +148,8 @@ public class QuerydslBasicTest {
   @Test
   public void paging1() {
     List<TeamMember> result = queryFactory
-        .selectFrom(QTeamMember.teamMember)
-        .orderBy(QTeamMember.teamMember.username.desc())
+        .selectFrom(teamMember)
+        .orderBy(teamMember.username.desc())
         .offset(1)
         .limit(2)
         .fetch();
@@ -155,8 +159,8 @@ public class QuerydslBasicTest {
   @Test
   public void paging2() {
     QueryResults<TeamMember> queryResults = queryFactory
-        .selectFrom(QTeamMember.teamMember)
-        .orderBy(QTeamMember.teamMember.username.desc())
+        .selectFrom(teamMember)
+        .orderBy(teamMember.username.desc())
         .offset(1)
         .limit(2)
         .fetchResults();
@@ -164,6 +168,49 @@ public class QuerydslBasicTest {
     Assertions.assertThat(queryResults.getLimit()).isEqualTo(2);
     Assertions.assertThat(queryResults.getOffset()).isEqualTo(1);
     Assertions.assertThat(queryResults.getResults()).isEqualTo(2);
+  }
+
+  @Test
+  public void aggregation() {
+    List<Tuple> result = queryFactory
+        .select(
+            teamMember.count(),
+            teamMember.age.sum(),
+            teamMember.age.avg(),
+            teamMember.age.max(),
+            teamMember.age.min()
+        )
+        .from(teamMember)
+        .fetch();
+
+    Tuple tuple = result.get(0);
+    Assertions.assertThat(tuple.get(teamMember.count())).isEqualTo(4);
+    Assertions.assertThat(tuple.get(teamMember.age.sum())).isEqualTo(100);
+    Assertions.assertThat(tuple.get(teamMember.age.avg())).isEqualTo(25);
+    Assertions.assertThat(tuple.get(teamMember.age.max())).isEqualTo(40);
+    Assertions.assertThat(tuple.get(teamMember.age.max())).isEqualTo(10);
+  }
+
+  /**
+   * 팀의 이름과 각 팀의 평균 연령을 구해라.
+   * */
+  @Test
+  public void group() throws Exception {
+    List<Tuple> result = queryFactory
+        .select(team.name, teamMember.age.avg())
+        .from(teamMember)
+        .join(teamMember.team, team)
+        .groupBy(team.name)
+        .fetch();
+
+    Tuple teamA = result.get(0);
+    Tuple teamB = result.get(1);
+
+    Assertions.assertThat(teamA.get(team.name)).isEqualTo("teamA");
+    Assertions.assertThat(teamA.get(teamMember.age.avg())).isEqualTo(15);
+
+    Assertions.assertThat(teamB.get(team.name)).isEqualTo("teamB");
+    Assertions.assertThat(teamB.get(teamMember.age.avg())).isEqualTo(35);
   }
 
 }
