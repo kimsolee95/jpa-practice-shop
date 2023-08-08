@@ -248,4 +248,53 @@ public class QuerydslBasicTest {
         .containsExactly("teamA", "teamB");
   }
 
+  /**
+   * 회원과 팀을 join하면서, 팀 명이 teamA인 팀만 join하고 회원을 모두 조회한다.
+   * select m, t from TeamMember tm left join tm.team t on t.name = 'teamA'
+   * */
+  @Test
+  public void join_on_filtering() {
+
+    //1) 동일 결과
+//    List<Tuple> result = queryFactory
+//        .select(teamMember, team)
+//        .from(teamMember)
+//        .leftJoin(teamMember.team, team)
+//        .on(team.name.eq("teamA"))
+//        .fetch();
+
+    //2) 동일 결과
+    List<Tuple> result = queryFactory
+        .select(teamMember, team)
+        .from(teamMember)
+        .join(teamMember.team, team)
+        .where(team.name.eq("teamA"))
+        .fetch();
+
+    for (Tuple tuple : result) {
+      System.out.println(tuple);
+    }
+  }
+
+  /**
+   * 연관관계 없는 엔티티 외부 join
+   * 회원 이름이 팀 이름과 같은 대상 외부 join
+   * */
+  @Test
+  public void join_on_no_relation() {
+    em.persist(new TeamMember("teamA"));
+    em.persist(new TeamMember("teamB"));
+    em.persist(new TeamMember("teamC"));
+
+    List<TeamMember> result = queryFactory
+        .select(teamMember)
+        .from(teamMember)
+        .leftJoin(team).on(teamMember.username.eq(team.name))
+        .fetch();
+
+    Assertions.assertThat(result)
+        .extracting("username")
+        .containsExactly("teamA", "teamB");
+  }
+
 }
