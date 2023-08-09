@@ -13,6 +13,8 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -295,6 +297,25 @@ public class QuerydslBasicTest {
     Assertions.assertThat(result)
         .extracting("username")
         .containsExactly("teamA", "teamB");
+  }
+
+  @PersistenceUnit
+  EntityManagerFactory emf;
+
+  @Test
+  public void fetchJoinNo() {
+    em.flush();
+    em.clear();
+
+    TeamMember findTeamMember = queryFactory
+        .selectFrom(teamMember)
+        .join(teamMember.team, team).fetchJoin()
+        .where(teamMember.username.eq("member1"))
+        .fetchOne();
+
+    boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findTeamMember.getTeam());
+    Assertions.assertThat(loaded).as("패치 조인 미적용").isTrue();
+
   }
 
 }
