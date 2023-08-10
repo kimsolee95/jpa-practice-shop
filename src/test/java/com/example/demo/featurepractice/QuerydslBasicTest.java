@@ -10,6 +10,7 @@ import com.example.demo.featurepractice.entity.Team;
 import com.example.demo.featurepractice.entity.TeamMember;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -41,8 +42,8 @@ public class QuerydslBasicTest {
 
     TeamMember member1 = new TeamMember("member1", 10, teamA);
     TeamMember member2 = new TeamMember("member2", 20, teamB);
-    TeamMember member3 = new TeamMember("member3", 10, teamA);
-    TeamMember member4 = new TeamMember("member4", 20, teamB);
+    TeamMember member3 = new TeamMember("member3", 30, teamA);
+    TeamMember member4 = new TeamMember("member4", 40, teamB);
     em.persist(member1);
     em.persist(member2);
     em.persist(member3);
@@ -315,7 +316,29 @@ public class QuerydslBasicTest {
 
     boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findTeamMember.getTeam());
     Assertions.assertThat(loaded).as("패치 조인 미적용").isTrue();
-
   }
+
+  /**
+   * 나이가 가장 많은 회원 조회
+   * */
+  @Test
+  public void subQuery() {
+    QTeamMember teamMemberSub = new QTeamMember("teamMemberSub");
+    List<TeamMember> result = queryFactory
+        .selectFrom(teamMember)
+        .where(teamMember.age.eq(
+            JPAExpressions
+                .select(teamMemberSub.age.max())
+                .from(teamMemberSub)
+        ))
+        .fetch();
+    Assertions.assertThat(result).extracting("age")
+        .containsExactly(40);
+  }
+
+  /**
+   * 나이가 평균 이상 회원
+   * */
+
 
 }
