@@ -339,6 +339,22 @@ public class QuerydslBasicTest {
   /**
    * 나이가 평균 이상 회원
    * */
+  @Test
+  public void subQueryGeo() {
+
+    QTeamMember teamMemberSub = new QTeamMember("teamMemberSub");
+    List<TeamMember> result = queryFactory
+        .selectFrom(teamMember)
+        .where(teamMember.age.goe(
+            JPAExpressions
+                .select(teamMemberSub.age.avg())
+                .from(teamMemberSub)
+        ))
+        .fetch();
+
+    Assertions.assertThat(result).extracting("age")
+        .containsExactly(30, 40);
+  }
 
 
 }
