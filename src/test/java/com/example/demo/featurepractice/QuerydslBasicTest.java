@@ -10,6 +10,8 @@ import com.example.demo.featurepractice.entity.Team;
 import com.example.demo.featurepractice.entity.TeamMember;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -341,7 +343,6 @@ public class QuerydslBasicTest {
    * */
   @Test
   public void subQueryGeo() {
-
     QTeamMember teamMemberSub = new QTeamMember("teamMemberSub");
     List<TeamMember> result = queryFactory
         .selectFrom(teamMember)
@@ -354,6 +355,91 @@ public class QuerydslBasicTest {
 
     Assertions.assertThat(result).extracting("age")
         .containsExactly(30, 40);
+  }
+
+  /**
+   * 나이가 평균 이상 회원
+   * */
+  @Test
+  public void subQueryIn() {
+    QTeamMember teamMemberSub = new QTeamMember("teamMemberSub");
+    List<TeamMember> result = queryFactory
+        .selectFrom(teamMember)
+        .where(teamMember.age.in(
+            JPAExpressions
+                .select(teamMemberSub.age)
+                .from(teamMemberSub)
+                .where(teamMemberSub.age.gt(10))
+        ))
+        .fetch();
+    Assertions.assertThat(result).extracting("age")
+        .containsExactly(20, 30, 40);
+  }
+
+  @Test
+  public void selectSubQuery() {
+    QTeamMember teamMemberSub = new QTeamMember("teamMemberSub");
+    List<Tuple> result = queryFactory
+        .select(teamMember.username,
+            JPAExpressions
+                .select(teamMemberSub.age.avg())
+                .from(teamMemberSub))
+        .from(teamMember)
+        .fetch();
+    for (Tuple tuple : result) {
+      System.out.println("tuple = " + tuple);
+    }
+  }
+
+  @Test
+  public void basicCase() {
+    List<String> result = queryFactory
+        .select(teamMember.age
+            .when(10).then("스무살")
+            .when(20).then("스무살")
+            .otherwise("기타"))
+        .fetch();
+    for (String s : result) {
+      System.out.println("s = " + s);
+    }
+  }
+
+  @Test
+  public void complexCase() {
+    List<String> result = queryFactory
+        .select(new CaseBuilder()
+            .when(teamMember.age.between(0, 20)).then("0~20살")
+            .when(teamMember.age.between(21,30)).then("21~30살")
+            .otherwise("기타")
+        ).from(teamMember)
+        .fetch();
+    for (String s : result) {
+      System.out.println("s = " + s);
+    }
+  }
+
+  @Test
+  public void constant() {
+    List<Tuple> result = queryFactory
+        .select(teamMember.username, Expressions.constant("A"))
+        .from(teamMember)
+        .fetch();
+    for (Tuple tuple : result) {
+      System.out.println("tuple = " + tuple);
+    }
+  }
+
+  @Test
+  public void concat() {
+    //{username}_{age}
+    List<String> result = queryFactory
+        .select(teamMember.username.concat("_").concat(teamMember.age.stringValue()))
+        .from(teamMember)
+        .where(teamMember.username.eq("member1"))
+        .fetch();
+    for (String s : result) {
+      System.out.println("s = " + s);
+    }
   }
 
 
