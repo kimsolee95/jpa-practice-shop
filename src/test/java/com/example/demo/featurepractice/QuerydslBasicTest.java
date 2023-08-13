@@ -3,8 +3,6 @@ package com.example.demo.featurepractice;
 import static com.example.demo.featurepractice.entity.QTeam.team;
 import static com.example.demo.featurepractice.entity.QTeamMember.teamMember;
 
-import com.example.demo.domain.Member;
-import com.example.demo.featurepractice.entity.QTeam;
 import com.example.demo.featurepractice.entity.QTeamMember;
 import com.example.demo.featurepractice.entity.Team;
 import com.example.demo.featurepractice.entity.TeamMember;
@@ -57,7 +55,7 @@ public class QuerydslBasicTest {
     //member1
     String qlString =
         "select tm from TeamMember tm "
-        + "where tm.username = :username";
+            + "where tm.username = :username";
     TeamMember findTeamMember = em.createQuery(qlString, TeamMember.class)
         .setParameter("username", "member1")
         .getSingleResult();
@@ -123,11 +121,8 @@ public class QuerydslBasicTest {
   }
 
   /**
-   * 회원 정렬
-   * 1. 회원 나이 내림차순
-   * 2. 회원 이름 올림차순
-   * 단, 회원 이름 없을 시, 마지막에 출력(null last)
-   * */
+   * 회원 정렬 1. 회원 나이 내림차순 2. 회원 이름 올림차순 단, 회원 이름 없을 시, 마지막에 출력(null last)
+   */
   @Test
   public void sort() {
     em.persist(new TeamMember(null, 100));
@@ -140,7 +135,7 @@ public class QuerydslBasicTest {
         .orderBy(
             teamMember.age.desc(),
             teamMember.username.asc().nullsLast()
-            )
+        )
         .fetch();
 
     TeamMember member5 = result.get(0);
@@ -199,7 +194,7 @@ public class QuerydslBasicTest {
 
   /**
    * 팀의 이름과 각 팀의 평균 연령을 구해라.
-   * */
+   */
   @Test
   public void group() throws Exception {
     List<Tuple> result = queryFactory
@@ -221,7 +216,7 @@ public class QuerydslBasicTest {
 
   /**
    * 팀 A 소속 모든 회원
-   * */
+   */
   @Test
   public void join() {
     List<TeamMember> result = queryFactory
@@ -236,7 +231,7 @@ public class QuerydslBasicTest {
 
   /**
    * 연관관계가 없어도 join 하는 예시
-   * */
+   */
   @Test
   public void theta_join() {
     em.persist(new TeamMember("teamA"));
@@ -254,9 +249,9 @@ public class QuerydslBasicTest {
   }
 
   /**
-   * 회원과 팀을 join하면서, 팀 명이 teamA인 팀만 join하고 회원을 모두 조회한다.
-   * select m, t from TeamMember tm left join tm.team t on t.name = 'teamA'
-   * */
+   * 회원과 팀을 join하면서, 팀 명이 teamA인 팀만 join하고 회원을 모두 조회한다. select m, t from TeamMember tm left join
+   * tm.team t on t.name = 'teamA'
+   */
   @Test
   public void join_on_filtering() {
 
@@ -282,9 +277,8 @@ public class QuerydslBasicTest {
   }
 
   /**
-   * 연관관계 없는 엔티티 외부 join
-   * 회원 이름이 팀 이름과 같은 대상 외부 join
-   * */
+   * 연관관계 없는 엔티티 외부 join 회원 이름이 팀 이름과 같은 대상 외부 join
+   */
   @Test
   public void join_on_no_relation() {
     em.persist(new TeamMember("teamA"));
@@ -322,7 +316,7 @@ public class QuerydslBasicTest {
 
   /**
    * 나이가 가장 많은 회원 조회
-   * */
+   */
   @Test
   public void subQuery() {
     QTeamMember teamMemberSub = new QTeamMember("teamMemberSub");
@@ -340,7 +334,7 @@ public class QuerydslBasicTest {
 
   /**
    * 나이가 평균 이상 회원
-   * */
+   */
   @Test
   public void subQueryGeo() {
     QTeamMember teamMemberSub = new QTeamMember("teamMemberSub");
@@ -359,7 +353,7 @@ public class QuerydslBasicTest {
 
   /**
    * 나이가 평균 이상 회원
-   * */
+   */
   @Test
   public void subQueryIn() {
     QTeamMember teamMemberSub = new QTeamMember("teamMemberSub");
@@ -409,7 +403,7 @@ public class QuerydslBasicTest {
     List<String> result = queryFactory
         .select(new CaseBuilder()
             .when(teamMember.age.between(0, 20)).then("0~20살")
-            .when(teamMember.age.between(21,30)).then("21~30살")
+            .when(teamMember.age.between(21, 30)).then("21~30살")
             .otherwise("기타")
         ).from(teamMember)
         .fetch();
@@ -439,6 +433,32 @@ public class QuerydslBasicTest {
         .fetch();
     for (String s : result) {
       System.out.println("s = " + s);
+    }
+  }
+
+  @Test
+  public void simpleProjection() {
+    List<String> result = queryFactory
+        .select(teamMember.username)
+        .from(teamMember)
+        .fetch();
+    for (String s : result) {
+      System.out.println("s = " + s);
+    }
+  }
+
+  @Test
+  public void tupleProjection() {
+    List<Tuple> result = queryFactory
+        .select(teamMember.username, teamMember.age)
+        .from(teamMember)
+        .fetch();
+
+    for (Tuple tuple : result) {
+      String username = tuple.get(teamMember.username);
+      Integer age = tuple.get(teamMember.age);
+      System.out.println("username = " + username);
+      System.out.println("age = " + age);
     }
   }
 
