@@ -482,7 +482,6 @@ public class QuerydslBasicTest {
     }
   }
 
-
   @Test
   public void findUserDto() {
     QTeamMember teamMemberSub = new QTeamMember("teamMemberSub");
@@ -501,5 +500,17 @@ public class QuerydslBasicTest {
     }
   }
 
+  @Test
+  public void findDtoByConstructor() {
+    List<UserDto> result = queryFactory
+        .select(Projections.constructor(UserDto.class,
+            teamMember.username,
+            teamMember.age))
+        .from(teamMember)
+        .fetch();
+    for (UserDto teamMemberDto : result) {
+      System.out.println("teamMemberDto = " + teamMemberDto);
+    }
+  }
 
 }
