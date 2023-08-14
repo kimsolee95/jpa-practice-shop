@@ -3,11 +3,16 @@ package com.example.demo.featurepractice;
 import static com.example.demo.featurepractice.entity.QTeam.team;
 import static com.example.demo.featurepractice.entity.QTeamMember.teamMember;
 
+import com.example.demo.featurepractice.dto.TeamMemberDto;
+import com.example.demo.featurepractice.dto.UserDto;
+import com.example.demo.featurepractice.entity.QTeam;
 import com.example.demo.featurepractice.entity.QTeamMember;
 import com.example.demo.featurepractice.entity.Team;
 import com.example.demo.featurepractice.entity.TeamMember;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -459,6 +464,40 @@ public class QuerydslBasicTest {
       Integer age = tuple.get(teamMember.age);
       System.out.println("username = " + username);
       System.out.println("age = " + age);
+    }
+  }
+
+  @Test
+  public void findDtoByField() {
+
+    List<TeamMemberDto> result = queryFactory
+        .select(Projections.bean(TeamMemberDto.class,
+            teamMember.username,
+            teamMember.age))
+        .from(teamMember)
+        .fetch();
+
+    for (TeamMemberDto teamMemberDto : result) {
+      System.out.println("teamMemberDto = " + teamMemberDto);
+    }
+  }
+
+
+  @Test
+  public void findUserDto() {
+    QTeamMember teamMemberSub = new QTeamMember("teamMemberSub");
+    List<UserDto> result = queryFactory
+        .select(Projections.fields(UserDto.class,
+            teamMember.username.as("name"),
+            ExpressionUtils.as(JPAExpressions
+                .select(teamMemberSub.age.max())
+                .from(teamMemberSub), "age")
+            ))
+        .from(teamMember)
+        .fetch();
+
+    for (UserDto userDto : result) {
+      System.out.println("userDto = " + userDto);
     }
   }
 
