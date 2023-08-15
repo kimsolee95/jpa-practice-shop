@@ -30,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -42,6 +43,7 @@ public class QuerydslBasicTest {
   JPAQueryFactory queryFactory;
 
   @BeforeEach
+  @Commit
   public void before() {
     queryFactory = new JPAQueryFactory(em);
     Team teamA = new Team("teamA");
@@ -572,4 +574,36 @@ public class QuerydslBasicTest {
     return usernameEq(usernameCond).and(ageEq(ageCond));
   }
 
+  @Test
+  @Commit
+  public void bulkUpdate() {
+
+    //member 1 = 10 -> 비회원
+    //member 2 = 20 -> 비회원
+
+    long count = queryFactory
+        .update(teamMember)
+        .set(teamMember.username, "비회원")
+        .where(teamMember.age.lt(28))
+        .execute();
+    em.flush();
+    em.clear();
+  }
+
+  @Test
+  public void buldAdd() {
+    long count = queryFactory
+        .update(teamMember)
+//        .set(teamMember.age, teamMember.age.add(1))
+        .set(teamMember.age, teamMember.age.multiply(2))
+        .execute();
+  }
+
+  @Test
+  public void bulkDelete() {
+    long count = queryFactory
+        .delete(teamMember)
+        .where(teamMember.age.gt(18))
+        .execute();
+  }
 }
