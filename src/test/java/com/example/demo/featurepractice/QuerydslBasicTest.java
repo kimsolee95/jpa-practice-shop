@@ -3,16 +3,20 @@ package com.example.demo.featurepractice;
 import static com.example.demo.featurepractice.entity.QTeam.team;
 import static com.example.demo.featurepractice.entity.QTeamMember.teamMember;
 
+import com.example.demo.featurepractice.dto.QTeamMemberDto;
 import com.example.demo.featurepractice.dto.TeamMemberDto;
 import com.example.demo.featurepractice.dto.UserDto;
 import com.example.demo.featurepractice.entity.QTeam;
 import com.example.demo.featurepractice.entity.QTeamMember;
 import com.example.demo.featurepractice.entity.Team;
 import com.example.demo.featurepractice.entity.TeamMember;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -511,6 +515,61 @@ public class QuerydslBasicTest {
     for (UserDto teamMemberDto : result) {
       System.out.println("teamMemberDto = " + teamMemberDto);
     }
+  }
+
+  @Test
+  public void findDtoByQueryProjection() {
+    List<TeamMemberDto> result = queryFactory
+        .select(new QTeamMemberDto(teamMember.username, teamMember.age))
+        .from(teamMember)
+        .fetch();
+    for (TeamMemberDto teamMemberDto : result) {
+      System.out.println("teamMemberDto = " + teamMemberDto);
+    }
+  }
+
+  @Test
+  public void dynamicQuery_BooleanBuilder() {
+    String usernameParam = "member1";
+    Integer ageParam = 10;
+
+    List<TeamMember> result = searchTeamMember1(usernameParam, ageParam);
+    Assertions.assertThat(result.size()).isEqualTo(1);
+
+  }
+
+  private List<TeamMember> searchTeamMember1(String usernameCond, Integer ageCond) {
+    BooleanBuilder builder = new BooleanBuilder();
+    if (usernameCond != null) {
+      builder.and(teamMember.username.eq(usernameCond));
+    }
+    if (ageCond != null) {
+      builder.and(teamMember.age.eq(ageCond));
+    }
+    return queryFactory
+        .selectFrom(teamMember)
+        .where(builder)
+        .fetch();
+  }
+
+  private List<TeamMember> searchTeamMember2(String usernameCond, Integer ageCond) {
+    return queryFactory
+        .selectFrom(teamMember)
+        //.where(usernameEq(usernameCond), ageEq(ageCond))
+        .where(allEq(usernameCond, ageCond))
+        .fetch();
+  }
+
+  private BooleanExpression usernameEq(String usernameCond) {
+    return usernameCond == null ? null : teamMember.username.eq(usernameCond);
+  }
+
+  private BooleanExpression ageEq(Integer ageCond) {
+    return ageCond != null ? teamMember.age.eq(ageCond) : null;
+  }
+
+  private BooleanExpression allEq(String usernameCond, Integer ageCond) {
+    return usernameEq(usernameCond).and(ageEq(ageCond));
   }
 
 }
