@@ -606,4 +606,37 @@ public class QuerydslBasicTest {
         .where(teamMember.age.gt(18))
         .execute();
   }
+
+  @Test
+  public void sqlFunction() {
+    List<String> result = queryFactory
+        .select(Expressions.stringTemplate(
+            "function('replace', {0}, {1}, {2})",
+            teamMember.username, "member", "M"
+        ))
+        .from(teamMember)
+        .fetch();
+
+    for (String s : result) {
+      System.out.println("s = " + s);
+    }
+  }
+
+  @Test
+  public void sqlFunction2() {
+    List<String> result = queryFactory
+        .select(teamMember.username)
+        .from(teamMember)
+//        .where(teamMember.username.eq(Expressions.stringTemplate(
+//            "function('lower', {0})",
+//            teamMember.username
+//        )))
+        .where(teamMember.username.eq(teamMember.username.lower()))
+        .fetch();
+
+    for (String s : result) {
+      System.out.println("s = " + s);
+    }
+  }
+
 }
