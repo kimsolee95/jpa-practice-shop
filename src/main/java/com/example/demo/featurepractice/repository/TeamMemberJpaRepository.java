@@ -7,12 +7,14 @@ import com.example.demo.featurepractice.dto.MemberSearchCondition;
 import com.example.demo.featurepractice.dto.MemberTeamDto;
 import com.example.demo.featurepractice.dto.QMemberTeamDto;
 import com.example.demo.featurepractice.entity.QTeamMember;
+import com.example.demo.featurepractice.entity.Team;
 import com.example.demo.featurepractice.entity.TeamMember;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
+import org.junit.Test;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -67,7 +69,7 @@ public class TeamMemberJpaRepository {
       builder.and(teamMember.username.eq(condition.getUsername()));
     }
     if (StringUtils.hasText(condition.getTeamName())) {
-      builder.and(team.name.eq(condition.getUsername()));
+      builder.and(team.name.eq(condition.getTeamName()));
     }
     if (condition.getAgeGoe() != null) {
       builder.and(teamMember.age.goe(condition.getAgeGoe()));
