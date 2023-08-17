@@ -95,7 +95,7 @@ public class TeamMemberJpaRepository {
   /**
    * 동적 쿼리 : BooleanExpression
    * */
-  public List<MemberTeamDto> search(MemberSearchCondition condition) {
+  public List<MemberTeamDto> searchTeamMember(MemberSearchCondition condition) {
     return queryFactory
         .select(new QMemberTeamDto(
             teamMember.id.as("memberId"),
@@ -110,8 +110,13 @@ public class TeamMemberJpaRepository {
             teamNameEq(condition.getTeamName()),
             ageGoe(condition.getAgeGoe()),
             ageLoe(condition.getAgeLoe())
+            //ageBetween(condition.getAgeLoe(), condition.getAgeGoe())
             )
         .fetch();
+  }
+
+  private BooleanExpression ageBetween(int ageLoe, int ageGoe) {
+    return ageGoe(ageLoe).and(ageGoe(ageGoe));
   }
 
   private BooleanExpression usernameEq(String username) {
