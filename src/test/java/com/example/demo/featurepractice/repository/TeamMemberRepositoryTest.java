@@ -10,6 +10,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -59,6 +61,30 @@ public class TeamMemberRepositoryTest {
 
     List<MemberTeamDto> result = teamMemberRepository.search(condition);
     Assertions.assertThat(result).extracting("username").containsExactly("member4");
+  }
+
+  @Test
+  public void searchPageSimple() {
+    Team teamA = new Team("teamA");
+    Team teamB = new Team("teamB");
+    em.persist(teamA);
+    em.persist(teamB);
+
+    TeamMember member1 = new TeamMember("member1", 10, teamA);
+    TeamMember member2 = new TeamMember("member2", 20, teamB);
+    TeamMember member3 = new TeamMember("member3", 30, teamA);
+    TeamMember member4 = new TeamMember("member4", 40, teamB);
+    em.persist(member1);
+    em.persist(member2);
+    em.persist(member3);
+    em.persist(member4);
+
+    MemberSearchCondition condition = new MemberSearchCondition();
+    PageRequest pageRequest = PageRequest.of(0, 4);
+
+    Page<MemberTeamDto> result = teamMemberRepository.searchPageSimple(condition, pageRequest);
+    Assertions.assertThat(result.getSize()).isEqualTo(4);
+    Assertions.assertThat(result.getContent()).extracting("username").containsExactly("member1");
   }
 
 }

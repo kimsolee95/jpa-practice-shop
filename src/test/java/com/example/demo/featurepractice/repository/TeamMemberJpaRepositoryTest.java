@@ -11,6 +11,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -63,7 +65,5 @@ class TeamMemberJpaRepositoryTest {
     List<MemberTeamDto> result = teamMemberJpaRepository.searchTeamMember(condition);
     Assertions.assertThat(result).extracting("username").containsExactly("member4");
   }
-
-
 
 }
