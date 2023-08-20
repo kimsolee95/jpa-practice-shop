@@ -6,14 +6,17 @@ import static com.example.demo.featurepractice.entity.QTeamMember.teamMember;
 import com.example.demo.featurepractice.dto.MemberSearchCondition;
 import com.example.demo.featurepractice.dto.MemberTeamDto;
 import com.example.demo.featurepractice.dto.QMemberTeamDto;
+import com.example.demo.featurepractice.entity.TeamMember;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import javax.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
 public class TeamMemberRepositoryImpl implements TeamMemberRepositoryCustom {
@@ -75,8 +78,20 @@ public class TeamMemberRepositoryImpl implements TeamMemberRepositoryCustom {
   @Override
   public Page<MemberTeamDto> searchPageComplex(MemberSearchCondition condition, Pageable pageable) {
     List<MemberTeamDto> content = getMemberTeamDtos(condition, pageable);
-    long total = getTotal(condition);
-    return new PageImpl<>(content, pageable, total);
+    //long total = getTotal(condition);
+
+    JPAQuery<TeamMember> countQuery = queryFactory
+        .select(teamMember)
+        .from(teamMember)
+        .leftJoin(teamMember.team, team)
+        .where(
+            usernameEq(condition.getUsername()),
+            teamNameEq(condition.getTeamName()),
+            ageGoe(condition.getAgeGoe()),
+            ageLoe(condition.getAgeLoe())
+        );
+//    return new PageImpl<>(content, pageable, total);
+    return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetchCount()); //countQuery::fetchCount
   }
 
   private List<MemberTeamDto> getMemberTeamDtos(MemberSearchCondition condition, Pageable pageable) {
